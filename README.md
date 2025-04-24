@@ -8,6 +8,12 @@ Stressen is a web-based stress prediction system that uses deep neural networks 
 - Tiffany
 - Olivia
 
+- Note on Environment Setup
+For detailed instructions on setting up the Stressen project environment, please refer to the ENVIRONMENT.md file in this repository. This document provides step-by-step guidance for installing dependencies and configuring the system to ensure the project runs correctly across different operating systems.
+
+Instead of relying on a VM appliance (which might face compatibility issues across different systems), we've created comprehensive documentation that enables a consistent setup process. This approach ensures that the project can be cloned and run without issues by peers on virtually any compatible system.
+
+
 ## 1. Introduction
 Chronic stress has become a prevalent health concern with significant impacts on physical and mental wellbeing. Traditional stress assessment methods rely on subjective self-reporting or specialized medical equipment, making continuous monitoring difficult and impractical for daily use. 
 
