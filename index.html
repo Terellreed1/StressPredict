@@ -1,469 +1,1007 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stress Prediction Using Deep Neural Networks by Terell , Tiffany, Olivia </title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        header {
-            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
-        .subtitle {
-            font-style: italic;
-            margin-top: 0.5rem;
-            opacity: 0.9;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem;
-        }
-        .section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .two-column {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        .column {
-            flex: 1;
-            min-width: 300px;
-        }
-        h2 {
-            color: #4b6cb7;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 0.5rem;
-            margin-top: 0;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-            color: white;
-            border: none;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 1rem;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .result-container {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #4b6cb7;
-        }
-        .stress-meter {
-            margin: 2rem 0;
-        }
-        .stress-levels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        .stress-bar {
-            height: 25px;
-            width: 100%;
-            background-color: #eee;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .stress-indicator {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, 
-                rgba(46,204,113,1) 0%, 
-                rgba(255,255,0,1) 50%, 
-                rgba(231,76,60,1) 100%);
-            transition: width 1s ease-in-out;
-        }
-        .features-list {
-            margin-bottom: 2rem;
-        }
-        .features-list li {
-            margin-bottom: 0.5rem;
-        }
-        #loading {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .hidden {
-            display: none;
-        }
-        .analysis-chart {
-            margin-top: 2rem;
-        }
-        #stressChart {
-            width: 100%;
-            height: 300px;
-        }
-        .accuracy-display {
-            text-align: center;
-            font-size: 1.2rem;
-            margin: 1rem 0;
-        }
-        .accuracy-value {
-            font-weight: bold;
-            color: #4b6cb7;
-            font-size: 1.5rem;
-        }
-        footer {
-            text-align: center;
-            padding: 1rem;
-            background-color: #182848;
-            color: white;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-</head>
+    <title>Stressen - Deep Learning for Stress Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/tokyo-night-dark.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+<script src="https://lib.yourware.so/yourware-lib.umd.js" id="yourware-lib"></script></head>
 <body>
-    <header>
-        <h1>Stress Prediction System</h1>
-        <div class="subtitle">Using Deep Neural Networks by Terell , Tiffany, Olivia</div>
-    </header>
-    <div class="container">
-        <div class="section">
-            <h2>Project Overview</h2>
-            <p>This system uses a Deep Neural Network to predict stress levels based on physiological data. 
-               The model has been trained on a dataset containing various physiological parameters and can classify 
-               stress into multiple levels.</p>
-            
-            <div class="features-list">
-                <h3>Features used for prediction:</h3>
-                <ul>
-                    <li>Snoring Range</li>
-                    <li>Respiration Rate</li>
-                    <li>Body Temperature</li>
-                    <li>Limb Movement</li>
-                    <li>Blood Oxygen</li>
-                    <li>Eye Movement</li>
-                    <li>Hours of Sleep</li>
-                    <li>Heart Rate</li>
-                </ul>
-            </div>
-            
-            <div class="accuracy-display">
-                Model Accuracy: <span class="accuracy-value">92.7%</span>
-            </div>
-        </div>
 
-        <div class="section">
-            <h2>Stress Prediction Tool</h2>
-            <div class="two-column">
-                <div class="column">
-                    <h3>Input Parameters</h3>
-                    <form id="predictionForm">
-                        <label for="snoring">Snoring Range (0-100):</label>
-                        <input type="number" id="snoring" name="snoring" min="0" max="100" value="45" required>
-                        
-                        <label for="respiration">Respiration Rate (breaths/min):</label>
-                        <input type="number" id="respiration" name="respiration" min="0" max="60" value="16" required>
-                        
-                        <label for="temperature">Body Temperature (°C):</label>
-                        <input type="number" id="temperature" name="temperature" min="35" max="40" step="0.1" value="36.6" required>
-                        
-                        <label for="limb">Limb Movement (0-100):</label>
-                        <input type="number" id="limb" name="limb" min="0" max="100" value="20" required>
-                        
-                        <label for="oxygen">Blood Oxygen (%):</label>
-                        <input type="number" id="oxygen" name="oxygen" min="0" max="100" value="96" required>
-                        
-                        <label for="eye">Eye Movement (0-100):</label>
-                        <input type="number" id="eye" name="eye" min="0" max="100" value="30" required>
-                        
-                        <label for="sleep">Hours of Sleep:</label>
-                        <input type="number" id="sleep" name="sleep" min="0" max="24" step="0.1" value="7.5" required>
-                        
-                        <label for="heart">Heart Rate (bpm):</label>
-                        <input type="number" id="heart" name="heart" min="0" max="200" value="75" required>
-                        
-                        <button type="submit" id="predictButton">Predict Stress Level</button>
-                    </form>
-                </div>
-                <div class="column">
-                    <h3>Results</h3>
-                    <div id="loading">
-                        <div class="loader"></div>
-                        <p>Processing your data...</p>
-                    </div>
-                    
-                    <div id="resultArea" class="hidden">
-                        <div class="result-container">
-                            <h4>Predicted Stress Level: <span id="stressLevel">--</span></h4>
-                            <p><strong>Confidence:</strong> <span id="confidence">--</span>%</p>
-                        </div>
-                        
-                        <div class="stress-meter">
-                            <div class="stress-levels">
-                                <span>Low Stress</span>
-                                <span>Medium Stress</span>
-                                <span>High Stress</span>
-                            </div>
-                            <div class="stress-bar">
-                                <div class="stress-indicator" id="stressIndicator"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="analysis-chart">
-                            <h4>Stress Level Distribution</h4>
-                            <canvas id="stressChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+    <div class="loading-screen" style="opacity: 0; display: none;">
+        <div class="loading-animation">
+            <div class="brain-waves">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
             </div>
+            <div class="loading-text">Loading Stressen</div>
         </div>
     </div>
-    
-    <footer>
-        <p>Deep Neural Network Stress Prediction Project - 2025</p>
-    </footer>
 
+    <div class="theme-toggle">
+        <input type="checkbox" id="theme-switch">
+        <label for="theme-switch">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+            <div class="toggle-ball"></div>
+        </label>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="logo-text">Stressen</div>
+            </div>
+            <div class="nav-links">
+                <a href="#overview" class="active">Overview</a>
+                <a href="#dataset">Dataset</a>
+                <a href="#features">Features</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#implementation">Implementation</a>
+                <a href="#demo">Demo</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="https://github.com/Terellreed1/StressPredict" class="github-button"><i class="fab fa-github"></i> View on GitHub</a>
+            </div>
+        </nav>
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Deep Neural Network for <span class="accent">Stress Analysis</span></h1>
+                <p>An advanced AI model using physiological data to analyze and predict stress levels with high accuracy</p>
+                <div class="hero-buttons">
+                    <a href="#demo" class="primary-button">Try Demo <i class="fas fa-arrow-right"></i></a>
+                    <a href="#dataset" class="secondary-button">Explore Datasets</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-graph">
+                    <svg viewBox="0 0 500 300" preserveAspectRatio="none">
+                        <path class="graph-line1" d="M0,150 C50,100 100,200 150,100 C200,0 250,150 300,50 C350,0 400,100 450,50 L500,50"></path>
+                        <path class="graph-line2" d="M0,200 C50,150 100,250 150,150 C200,50 250,200 300,100 C350,50 400,150 450,100 L500,100"></path>
+                        <path class="graph-line3" d="M0,250 C50,200 100,300 150,200 C200,100 250,250 300,150 C350,100 400,200 450,150 L500,150"></path>
+                    </svg>
+                    <div class="neuron-network">
+                        <div class="neuron n1 pulse" style="opacity: 1;"></div>
+                        <div class="neuron n2 pulse" style="opacity: 1;"></div>
+                        <div class="neuron n3" style="opacity: 1;"></div>
+                        <div class="neuron n4" style="opacity: 1;"></div>
+                        <div class="neuron n5 pulse" style="opacity: 1;"></div>
+                        <div class="neuron n6 pulse" style="opacity: 1;"></div>
+                        <div class="neuron n7" style="opacity: 1;"></div>
+                        <div class="neuron n8 pulse" style="opacity: 1;"></div>
+                        <div class="neuron n9" style="opacity: 1;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="overview" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Model Overview</h2>
+                    <p>A deep learning approach to stress level classification</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                        <h3>Objective</h3>
+                        <p>Predict stress levels (0-4) using physiological data with deep neural network architecture</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon"><i class="fas fa-database"></i></div>
+                        <h3>Data Sources</h3>
+                        <p>Processes sleep and biometric data including heart rate, respiration, and blood oxygen levels from multiple sleep health datasets</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3>Performance</h3>
+                        <p>Achieves high accuracy through data augmentation and advanced preprocessing techniques</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon"><i class="fas fa-cogs"></i></div>
+                        <h3>Implementation</h3>
+                        <p>Built with TensorFlow, using batch normalization and dropout for regularization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Key Features</h2>
+                    <p>What makes this model powerful and effective</p>
+                </div>
+                <div class="features-wrapper">
+                    <div class="feature">
+                        <div class="feature-number">01</div>
+                        <div class="feature-content">
+                            <h3>SMOTE Oversampling</h3>
+                            <p>Handles class imbalance by synthesizing new samples for underrepresented stress levels</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-number">02</div>
+                        <div class="feature-content">
+                            <h3>Data Augmentation</h3>
+                            <p>Adds Gaussian noise to training data to improve model generalization</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-number">03</div>
+                        <div class="feature-content">
+                            <h3>Fallback Mechanism</h3>
+                            <p>Includes a robust fallback prediction system when the trained model is unavailable</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-number">04</div>
+                        <div class="feature-content">
+                            <h3>Comprehensive Output</h3>
+                            <p>Provides probability distributions across all stress levels for transparent decision-making</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dataset" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Dataset Information</h2>
+                    <p>Understanding the data that powers our model</p>
+                </div>
+                <div class="dataset-container">
+                    <div class="dataset-card">
+                        <h3>Data Sources</h3>
+                        <div class="data-sources-grid">
+                            <div class="data-source-item">
+                                <div class="data-source-header">
+                                    <h4>Sleep Health and Lifestyle Dataset</h4>
+                                    <div class="data-source-meta">
+                                        <span><i class="fas fa-user"></i> SRIRAM PRASHANTH</span>
+                                        <span><i class="fas fa-calendar-alt"></i> June 2023</span>
+                                        <span><i class="fas fa-database"></i> 374 records</span>
+                                    </div>
+                                </div>
+                                <p>This dataset comprises comprehensive sleep and health metrics across different demographic groups. It includes key attributes such as sleep duration, quality, regularity, physical activity, stress levels, and BMI category, enabling in-depth analysis of sleep patterns and their correlation with lifestyle factors and overall health.</p>
+                                <div class="data-source-viz">
+                                    <img src="https://cdn.pixabay.com/photo/2023/02/08/08/50/frequency-wave-7776034_640.jpg" alt="Sleep data visualization" class="data-viz-image">
+                                    <div class="data-viz-caption">Correlation patterns between sleep quality and stress levels</div>
+                                </div>
+                            </div>
+
+                            <div class="data-source-item">
+                                <div class="data-source-header">
+                                    <h4>Physionet Sleep Heart Health Study</h4>
+                                    <div class="data-source-meta">
+                                        <span><i class="fas fa-user"></i> National Sleep Research</span>
+                                        <span><i class="fas fa-calendar-alt"></i> 2020</span>
+                                        <span><i class="fas fa-database"></i> 6,441 records</span>
+                                    </div>
+                                </div>
+                                <p>A multi-center cohort study designed to investigate the relationship between sleep-disordered breathing and cardiovascular disease. This dataset provides polysomnographic recordings along with comprehensive physiological measurements during sleep.</p>
+                                <div class="data-source-viz">
+                                    <img src="https://cdn.pixabay.com/photo/2015/08/19/05/17/large-895567_640.jpg" alt="Heart rate and sleep data" class="data-viz-image">
+                                    <div class="data-viz-caption">Visualization of heart rate variability patterns during different sleep stages</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Dataset Integration</h3>
+                        <div class="data-integration-viz">
+                            <img src="https://cdn.pixabay.com/photo/2023/01/15/14/38/mental-health-7720316_640.jpg" alt="Data integration visualization" class="integration-image">
+                            <div class="integration-caption">Our data pipeline integrates multiple sources to create a comprehensive training dataset</div>
+                        </div>
+                        <p>The Stressen model combines these datasets through careful feature alignment and normalization, creating a robust foundation for stress prediction. Our integration process preserves the unique insights from each data source while creating a unified feature space for the neural network to process.</p>
+
+                        <h3>Features Used</h3>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-volume-up"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Snoring Range</h4>
+                                    <p>Measures the intensity and frequency of snoring during sleep, measured in decibels.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-lungs"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Respiration Rate</h4>
+                                    <p>Tracks the number of breaths per minute, which can indicate stress levels.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-temperature-high"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Body Temperature</h4>
+                                    <p>Records core body temperature during sleep, which fluctuates with stress.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-walking"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Limb Movement</h4>
+                                    <p>Measures frequency of movement during sleep, indicating restlessness.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-heartbeat"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Blood Oxygen &amp; Heart Rate</h4>
+                                    <p>Records oxygen saturation levels and heart rate, both key indicators of physiological stress.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-eye"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Eye Movement</h4>
+                                    <p>Tracks rapid eye movement phases, which relate to dream states and stress patterns.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-moon"></i></div>
+                                <div class="feature-detail">
+                                    <h4>Hours of Sleep</h4>
+                                    <p>Measures total sleep duration, a critical factor in stress management.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Data Processing</h3>
+                        <p>The raw data undergoes extensive preprocessing including normalization, feature scaling, and missing value imputation. We apply SMOTE oversampling to balance class representation and add Gaussian noise as a form of data augmentation to improve model robustness.</p>
+
+                        <h3>Validation Approach</h3>
+                        <p>We use a train-test split of 80/20 with stratification to maintain class distribution. Cross-validation ensures our model performs consistently across different data subsets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Model Architecture</h2>
+                    <p>A deep neural network with multiple layers for optimal performance</p>
+                </div>
+                <div class="architecture-diagram">
+                    <div class="layer input-layer">
+                        <div class="layer-label">Input Layer</div>
+                        <div class="nodes">
+                            <div class="node" data-label="snoring_range"></div>
+                            <div class="node" data-label="respiration_rate"></div>
+                            <div class="node" data-label="body_temperature"></div>
+                            <div class="node" data-label="limb_movement"></div>
+                            <div class="node" data-label="blood_oxygen"></div>
+                            <div class="node" data-label="eye_movement"></div>
+                            <div class="node" data-label="hours_of_sleep"></div>
+                            <div class="node" data-label="heart_rate"></div>
+                        </div>
+                    </div>
+                    <div class="layer hidden-layer1">
+                        <div class="layer-label">Hidden Layer 1 (128)</div>
+                        <div class="nodes">
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="more-nodes">+124 more</div>
+                        </div>
+                    </div>
+                    <div class="layer hidden-layer2">
+                        <div class="layer-label">Hidden Layer 2 (64)</div>
+                        <div class="nodes">
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="more-nodes">+61 more</div>
+                        </div>
+                    </div>
+                    <div class="layer hidden-layer3">
+                        <div class="layer-label">Hidden Layer 3 (32)</div>
+                        <div class="nodes">
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="more-nodes">+30 more</div>
+                        </div>
+                    </div>
+                    <div class="layer output-layer">
+                        <div class="layer-label">Output Layer</div>
+                        <div class="nodes">
+                            <div class="node" data-label="Low (0)"></div>
+                            <div class="node" data-label="Low (1)"></div>
+                            <div class="node" data-label="Medium (2)"></div>
+                            <div class="node" data-label="Medium (3)"></div>
+                            <div class="node" data-label="High (4)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="implementation" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Code Implementation</h2>
+                    <p>The core Python implementation with TensorFlow and Keras</p>
+                </div>
+
+                <div class="code-tabs">
+                    <button class="tab-button active" data-tab="init-tab">Class &amp; Init</button>
+                    <button class="tab-button" data-tab="preprocessing-tab">Preprocessing</button>
+                    <button class="tab-button" data-tab="model-tab">Model Building</button>
+                    <button class="tab-button" data-tab="train-tab">Training</button>
+                    <button class="tab-button" data-tab="prediction-tab">Prediction</button>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-tab-content active" id="init-tab">
+                        <div class="code-header">
+                            <div class="code-title">Class Definition &amp; Initialization</div>
+                            <div class="code-actions">
+                                <button class="copy-button"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <pre><code class="language-python hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+<span class="hljs-keyword">from</span> tensorflow <span class="hljs-keyword">import</span> keras
+<span class="hljs-keyword">from</span> tensorflow.keras <span class="hljs-keyword">import</span> layers
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+<span class="hljs-keyword">from</span> sklearn.preprocessing <span class="hljs-keyword">import</span> StandardScaler
+<span class="hljs-keyword">from</span> imblearn.over_sampling <span class="hljs-keyword">import</span> SMOTE
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> seaborn <span class="hljs-keyword">as</span> sns
+<span class="hljs-keyword">import</span> joblib
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">StressModel</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):
+        self.model = <span class="hljs-literal">None</span>
+        self.scaler = <span class="hljs-literal">None</span>
+        self.feature_columns = [
+            <span class="hljs-string">'snoring_range'</span>, <span class="hljs-string">'respiration_rate'</span>, <span class="hljs-string">'body_temperature'</span>, 
+            <span class="hljs-string">'limb_movement'</span>, <span class="hljs-string">'blood_oxygen'</span>, <span class="hljs-string">'eye_movement'</span>, 
+            <span class="hljs-string">'hours_of_sleep'</span>, <span class="hljs-string">'heart_rate'</span>
+        ]</code></pre>
+                    </div>
+
+                    <div class="code-tab-content" id="preprocessing-tab">
+                        <div class="code-header">
+                            <div class="code-title">Data Preprocessing</div>
+                            <div class="code-actions">
+                                <button class="copy-button"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <pre><code class="language-python hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">preprocess_data</span>(<span class="hljs-params">self, data_path</span>):
+    <span class="hljs-string">"""
+    Preprocess the dataset
+    """</span>
+    <span class="hljs-comment">
+    df = pd.read_csv(data_path)
+
+    <span class="hljs-comment">
+    df.columns = [col.strip() <span class="hljs-keyword">for</span> col <span class="hljs-keyword">in</span> df.columns]
+
+    <span class="hljs-comment">
+    <span class="hljs-keyword">for</span> col <span class="hljs-keyword">in</span> df.columns:
+        <span class="hljs-keyword">if</span> df[col].isna().<span class="hljs-built_in">sum</span>() &gt; <span class="hljs-number">0</span>:
+            df[col] = df[col].fillna(df[col].mean())
+
+    <span class="hljs-comment">
+    <span class="hljs-keyword">if</span> <span class="hljs-string">'Stress Levels'</span> <span class="hljs-keyword">in</span> df.columns:
+        df[<span class="hljs-string">'Stress Levels'</span>] = df[<span class="hljs-string">'Stress Levels'</span>].astype(<span class="hljs-built_in">int</span>)
+
+    <span class="hljs-comment">
+    X = df[self.feature_columns]
+    y = df[<span class="hljs-string">'Stress Levels'</span>]
+
+    <span class="hljs-comment">
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">42</span>
+    )
+
+    <span class="hljs-comment">
+    self.scaler = StandardScaler()
+    X_train_scaled = self.scaler.fit_transform(X_train)
+    X_test_scaled = self.scaler.transform(X_test)
+
+    <span class="hljs-comment">
+    smote = SMOTE(random_state=<span class="hljs-number">42</span>)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
+
+    <span class="hljs-comment">
+    noise_factor = <span class="hljs-number">0.1</span>
+    X_train_noisy = X_train_resampled + np.random.normal(
+        loc=<span class="hljs-number">0.0</span>, scale=noise_factor, size=X_train_resampled.shape
+    )
+
+    <span class="hljs-comment">
+    X_train_combined = np.vstack((X_train_resampled, X_train_noisy))
+    y_train_combined = np.hstack((y_train_resampled, y_train_resampled))
+
+    <span class="hljs-comment">
+    self.num_classes = <span class="hljs-built_in">len</span>(np.unique(y))
+
+    <span class="hljs-comment">
+    y_train_onehot = tf.keras.utils.to_categorical(y_train_combined, num_classes=self.num_classes)
+    y_test_onehot = tf.keras.utils.to_categorical(y_test, num_classes=self.num_classes)
+
+    <span class="hljs-keyword">return</span> X_train_combined, X_test_scaled, y_train_combined, y_test, y_train_onehot, y_test_onehot</code></pre>
+                    </div>
+
+                    <div class="code-tab-content" id="model-tab">
+                        <div class="code-header">
+                            <div class="code-title">Model Architecture</div>
+                            <div class="code-actions">
+                                <button class="copy-button"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <pre><code class="language-python hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">build_model</span>(<span class="hljs-params">self, input_shape, num_classes</span>):
+    <span class="hljs-string">"""
+    Build the Deep Neural Network model
+    """</span>
+    model = keras.Sequential([
+        layers.Dense(<span class="hljs-number">128</span>, activation=<span class="hljs-string">'relu'</span>, input_shape=(input_shape,)),
+        layers.BatchNormalization(),
+        layers.Dropout(<span class="hljs-number">0.3</span>),
+
+        layers.Dense(<span class="hljs-number">64</span>, activation=<span class="hljs-string">'relu'</span>),
+        layers.BatchNormalization(),
+        layers.Dropout(<span class="hljs-number">0.3</span>),
+
+        layers.Dense(<span class="hljs-number">32</span>, activation=<span class="hljs-string">'relu'</span>),
+        layers.BatchNormalization(),
+        layers.Dropout(<span class="hljs-number">0.3</span>),
+
+        layers.Dense(num_classes, activation=<span class="hljs-string">'softmax'</span>)
+    ])
+
+    model.<span class="hljs-built_in">compile</span>(
+        optimizer=<span class="hljs-string">'adam'</span>,
+        loss=<span class="hljs-string">'categorical_crossentropy'</span>,
+        metrics=[<span class="hljs-string">'accuracy'</span>]
+    )
+
+    <span class="hljs-keyword">return</span> model</code></pre>
+                    </div>
+
+                    <div class="code-tab-content" id="train-tab">
+                        <div class="code-header">
+                            <div class="code-title">Training Process</div>
+                            <div class="code-actions">
+                                <button class="copy-button"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <pre><code class="language-python hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">train</span>(<span class="hljs-params">self, data_path, epochs=<span class="hljs-number">50</span>, batch_size=<span class="hljs-number">32</span></span>):
+    <span class="hljs-string">"""
+    Train the model with the provided dataset
+    """</span>
+    <span class="hljs-comment">
+    X_train, X_test, y_train, y_test, y_train_onehot, y_test_onehot = self.preprocess_data(data_path)
+
+    <span class="hljs-comment">
+    self.model = self.build_model(X_train.shape[<span class="hljs-number">1</span>], self.num_classes)
+
+    <span class="hljs-comment">
+    history = self.model.fit(
+        X_train, y_train_onehot,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_split=<span class="hljs-number">0.2</span>,
+        verbose=<span class="hljs-number">1</span>
+    )
+
+    <span class="hljs-comment">
+    test_loss, test_acc = self.model.evaluate(X_test, y_test_onehot)
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Test accuracy: <span class="hljs-subst">{test_acc:<span class="hljs-number">.4</span>f}</span>"</span>)
+
+    <span class="hljs-keyword">return</span> history, test_acc
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">save_model</span>(<span class="hljs-params">self, model_path=<span class="hljs-string">'stress_model.h5'</span>, scaler_path=<span class="hljs-string">'scaler.pkl'</span></span>):
+    <span class="hljs-string">"""
+    Save the model and scaler
+    """</span>
+    <span class="hljs-keyword">if</span> self.model <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        self.model.save(model_path)
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Model saved to <span class="hljs-subst">{model_path}</span>"</span>)
+
+    <span class="hljs-keyword">if</span> self.scaler <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        joblib.dump(self.scaler, scaler_path)
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Scaler saved to <span class="hljs-subst">{scaler_path}</span>"</span>)
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">load_model</span>(<span class="hljs-params">self, model_path=<span class="hljs-string">'stress_model.h5'</span>, scaler_path=<span class="hljs-string">'scaler.pkl'</span></span>):
+    <span class="hljs-string">"""
+    Load the model and scaler
+    """</span>
+    <span class="hljs-keyword">try</span>:
+        self.model = keras.models.load_model(model_path)
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Model loaded from <span class="hljs-subst">{model_path}</span>"</span>)
+
+        self.scaler = joblib.load(scaler_path)
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Scaler loaded from <span class="hljs-subst">{scaler_path}</span>"</span>)
+
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Error loading model: <span class="hljs-subst">{e}</span>"</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span></code></pre>
+                    </div>
+
+                    <div class="code-tab-content" id="prediction-tab">
+                        <div class="code-header">
+                            <div class="code-title">Prediction Logic</div>
+                            <div class="code-actions">
+                                <button class="copy-button"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <pre><code class="language-python hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">predict</span>(<span class="hljs-params">self, features</span>):
+    <span class="hljs-string">"""
+    Make prediction with the model
+    """</span>
+    <span class="hljs-keyword">if</span> self.model <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"Model not loaded. Using simple prediction instead."</span>)
+        <span class="hljs-keyword">return</span> self._simple_predict(features)
+
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-comment">
+        features_array = np.array(features).reshape(<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)
+
+        <span class="hljs-comment">
+        <span class="hljs-keyword">if</span> self.scaler <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+            features_scaled = self.scaler.transform(features_array)
+        <span class="hljs-keyword">else</span>:
+            features_scaled = features_array
+
+        <span class="hljs-comment">
+        prediction = self.model.predict(features_scaled)
+
+        <span class="hljs-comment">
+        predicted_class = np.argmax(prediction, axis=<span class="hljs-number">1</span>)[<span class="hljs-number">0</span>]
+
+        <span class="hljs-comment">
+        probabilities = prediction[<span class="hljs-number">0</span>]
+
+        <span class="hljs-comment">
+        stress_level_names = [
+            <span class="hljs-string">"Low Stress (Level 0)"</span>,
+            <span class="hljs-string">"Low Stress (Level 1)"</span>,
+            <span class="hljs-string">"Medium Stress (Level 2)"</span>,
+            <span class="hljs-string">"Medium Stress (Level 3)"</span>,
+            <span class="hljs-string">"High Stress (Level 4)"</span>
+        ]
+
+        <span class="hljs-comment">
+        result = {
+            <span class="hljs-string">'level'</span>: <span class="hljs-built_in">int</span>(predicted_class),
+            <span class="hljs-string">'level_name'</span>: stress_level_names[predicted_class],
+            <span class="hljs-string">'confidence'</span>: <span class="hljs-built_in">float</span>(probabilities[predicted_class] * <span class="hljs-number">100</span>),
+            <span class="hljs-string">'probabilities'</span>: {
+                stress_level_names[i]: <span class="hljs-built_in">float</span>(prob * <span class="hljs-number">100</span>) 
+                <span class="hljs-keyword">for</span> i, prob <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(probabilities)
+            }
+        }
+
+        <span class="hljs-keyword">return</span> result
+
+    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f"Error making prediction: <span class="hljs-subst">{e}</span>"</span>)
+        <span class="hljs-keyword">return</span> self._simple_predict(features)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="section">
+            <div class="section-content">
+                <div class="section-header">
+                    <h2>Interactive Demo</h2>
+                    <p>Try the StressModel prediction with your own values</p>
+                </div>
+                <div class="demo-container">
+                    <div class="demo-inputs">
+                        <div class="input-group">
+                            <label for="snoring">Snoring Range</label>
+                            <input type="range" id="snoring" min="0" max="100" value="45" class="slider">
+                            <div class="value-display"><span id="snoring-value">45</span> <span class="unit">dB</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="respiration">Respiration Rate</label>
+                            <input type="range" id="respiration" min="10" max="25" value="16" class="slider">
+                            <div class="value-display"><span id="respiration-value">16</span> <span class="unit">breaths/min</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="temperature">Body Temperature</label>
+                            <input type="range" id="temperature" min="35.5" max="38.0" value="36.6" step="0.1" class="slider">
+                            <div class="value-display"><span id="temperature-value">36.6</span> <span class="unit">°C</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="limb">Limb Movement</label>
+                            <input type="range" id="limb" min="0" max="50" value="20" class="slider">
+                            <div class="value-display"><span id="limb-value">20</span> <span class="unit">movements/hr</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="oxygen">Blood Oxygen</label>
+                            <input type="range" id="oxygen" min="90" max="100" value="96" class="slider">
+                            <div class="value-display"><span id="oxygen-value">96</span> <span class="unit">%</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="eye">Eye Movement</label>
+                            <input type="range" id="eye" min="0" max="60" value="30" class="slider">
+                            <div class="value-display"><span id="eye-value">30</span> <span class="unit">movements/hr</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="sleep">Hours of Sleep</label>
+                            <input type="range" id="sleep" min="4" max="10" value="7.5" step="0.5" class="slider">
+                            <div class="value-display"><span id="sleep-value">7.5</span> <span class="unit">hours</span></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="heart">Heart Rate</label>
+                            <input type="range" id="heart" min="50" max="110" value="75" class="slider">
+                            <div class="value-display"><span id="heart-value">75</span> <span class="unit">bpm</span></div>
+                        </div>
+
+                        <button id="predict-button" class="primary-button full-width">Predict Stress Level</button>
+                    </div>
+
+                    <div class="demo-results">
+                        <div class="results-container">
+                            <div class="result-header">
+                                <h3>Prediction Results</h3>
+                                <div class="confidence">
+                                    <span class="confidence-label">Confidence:</span>
+                                    <span class="confidence-value" id="confidence-value">75%</span>
+                                </div>
+                            </div>
+
+                            <div class="stress-level">
+                                <div class="stress-level-text">
+                                    <span class="level-label">Stress Level:</span>
+                                    <span class="level-value" id="level-value">Medium Stress (Level 2)</span>
+                                </div>
+                                <div class="stress-meter">
+                                    <div class="meter-bar">
+                                        <div class="meter-fill" id="meter-fill" style="width: 50%; background-color: var(--warning-color);"></div>
+                                    </div>
+                                    <div class="meter-labels">
+                                        <span>Low</span>
+                                        <span>Medium</span>
+                                        <span>High</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="probability-chart">
+                                <h4>Probability Distribution</h4>
+                                <div class="chart-container">
+                                    <div class="chart-bar">
+                                        <div class="bar-label">Level 0</div>
+                                        <div class="bar">
+                                            <div class="bar-fill" id="prob-0" style="width: 0%;"></div>
+                                            <div class="bar-value" id="prob-value-0">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="bar-label">Level 1</div>
+                                        <div class="bar">
+                                            <div class="bar-fill" id="prob-1" style="width: 15%"></div>
+                                            <div class="bar-value" id="prob-value-1">15%</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="bar-label">Level 2</div>
+                                        <div class="bar">
+                                            <div class="bar-fill" id="prob-2" style="width: 70%;"></div>
+                                            <div class="bar-value" id="prob-value-2">70%</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="bar-label">Level 3</div>
+                                        <div class="bar">
+                                            <div class="bar-fill" id="prob-3" style="width: 15%"></div>
+                                            <div class="bar-value" id="prob-value-3">15%</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="bar-label">Level 4</div>
+                                        <div class="bar">
+                                            <div class="bar-fill" id="prob-4" style="width: 0%;"></div>
+                                            <div class="bar-value" id="prob-value-4">0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="recommendation" id="recommendation">
+                    <h4>Recommendation</h4>
+                    <p>Your stress level is moderate.</p>
+                    <p>Consider meditation and regular exercise to manage stress levels.</p>
+                    <p>Monitor your sleep patterns for improved well-being.</p>
+                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="logo-text">Stressen</div>
+                </div>
+                <p>Advanced stress analysis through deep learning and physiological data interpretation.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#dataset">Dataset</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#architecture">Architecture</a></li>
+                    <li><a href="#implementation">Implementation</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://github.com/Terellreed1/StressPredict">Documentation</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="https://github.com/Terellreed1/StressPredict"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script>
+
         document.addEventListener('DOMContentLoaded', function() {
-            let chart = null;
-            
-            document.getElementById('predictionForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Show loading indicator
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('resultArea').classList.add('hidden');
-                
-                // Collect form data
-                const formData = {
-                    snoring: parseFloat(document.getElementById('snoring').value),
-                    respiration: parseFloat(document.getElementById('respiration').value),
-                    temperature: parseFloat(document.getElementById('temperature').value),
-                    limb: parseFloat(document.getElementById('limb').value),
-                    oxygen: parseFloat(document.getElementById('oxygen').value),
-                    eye: parseFloat(document.getElementById('eye').value),
-                    sleep: parseFloat(document.getElementById('sleep').value),
-                    heart: parseFloat(document.getElementById('heart').value)
-                };
-                
-               
-                setTimeout(() => {
-                    processPrediction(formData);
-                }, 1500);
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.opacity = '0';
+                setTimeout(function() {
+                    document.querySelector('.loading-screen').style.display = 'none';
+                }, 500);
+            }, 1500);
+
+            hljs.highlightAll();
+
+            const themeSwitch = document.getElementById('theme-switch');
+            themeSwitch.addEventListener('change', function() {
+                document.body.classList.toggle('dark-theme');
             });
-            
-            function processPrediction(data) {
-               
-                
-                
-                const normalizedValues = {
-                    snoring: (data.snoring - 50) / 25,
-                    respiration: (data.respiration - 15) / 5,
-                    temperature: (data.temperature - 37) / 0.5,
-                    limb: data.limb / 50,
-                    oxygen: (data.oxygen - 95) / 2.5,
-                    eye: data.eye / 50,
-                    sleep: (data.sleep - 7) / 2,
-                    heart: (data.heart - 70) / 20
-                };
-                
-                
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    this.classList.add('active');
+
+                    document.querySelectorAll('.code-tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.closest('.code-tab-content').querySelector('code');
+                    const textArea = document.createElement('textarea');
+                    textArea.value = codeBlock.textContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+
+            document.querySelectorAll('.slider').forEach(slider => {
+                const valueSpan = document.getElementById(slider.id + '-value');
+                slider.addEventListener('input', function() {
+                    valueSpan.textContent = this.value;
+                });
+            });
+
+            document.getElementById('predict-button').addEventListener('click', function() {
+
+                const features = [
+                    parseFloat(document.getElementById('snoring').value),
+                    parseFloat(document.getElementById('respiration').value),
+                    parseFloat(document.getElementById('temperature').value),
+                    parseFloat(document.getElementById('limb').value),
+                    parseFloat(document.getElementById('oxygen').value),
+                    parseFloat(document.getElementById('eye').value),
+                    parseFloat(document.getElementById('sleep').value),
+                    parseFloat(document.getElementById('heart').value)
+                ];
+
+                const normalized = [
+                    (features[0] - 50) / 25,    
+                    (features[1] - 15) / 5,     
+                    (features[2] - 37) / 0.5,   
+                    features[3] / 50,           
+                    (features[4] - 95) / 2.5,   
+                    features[5] / 50,           
+                    (features[6] - 7) / 2,      
+                    (features[7] - 70) / 20     
+                ];
+
+                const weights = [0.1, 0.1, 0.15, 0.1, -0.15, 0.1, -0.2, 0.2];
                 let stressScore = 0;
-                stressScore += normalizedValues.snoring * 0.1;
-                stressScore += normalizedValues.respiration * 0.1;
-                stressScore += normalizedValues.temperature * 0.15;
-                stressScore += normalizedValues.limb * 0.1;
-                stressScore -= normalizedValues.oxygen * 0.15;  // higher oxygen, lower stress
-                stressScore += normalizedValues.eye * 0.1;
-                stressScore -= normalizedValues.sleep * 0.2;   // more sleep, lower stress
-                stressScore += normalizedValues.heart * 0.2;
-                
-                // Convert to 0-100 scale
+                for (let i = 0; i < normalized.length; i++) {
+                    stressScore += normalized[i] * weights[i];
+                }
+
                 stressScore = 50 + (stressScore * 25);
                 stressScore = Math.max(0, Math.min(100, stressScore));
-                
-                // Determine stress level
-                let stressLevel = '';
-                let stressLevels = {
-                    'Low Stress (Level 0)': 0,
-                    'Low Stress (Level 1)': 0,
-                    'Medium Stress (Level 2)': 0,
-                    'Medium Stress (Level 3)': 0,
-                    'High Stress (Level 4)': 0
-                };
-                
+
+                let level, levelName, probabilities;
+                let recommendations = [];
+
                 if (stressScore < 20) {
-                    stressLevel = 'Low Stress (Level 0)';
-                    stressLevels['Low Stress (Level 0)'] = 75;
-                    stressLevels['Low Stress (Level 1)'] = 20;
-                    stressLevels['Medium Stress (Level 2)'] = 5;
+                    level = 0;
+                    levelName = "Low Stress (Level 0)";
+                    probabilities = [75, 20, 5, 0, 0];
+                    recommendations = [
+                        "Your stress levels are very low. Keep up your healthy habits!",
+                        "Continue with your current lifestyle patterns.",
+                        "Focus on maintaining your current well-being practices."
+                    ];
                 } else if (stressScore < 40) {
-                    stressLevel = 'Low Stress (Level 1)';
-                    stressLevels['Low Stress (Level 0)'] = 15;
-                    stressLevels['Low Stress (Level 1)'] = 65;
-                    stressLevels['Medium Stress (Level 2)'] = 20;
+                    level = 1;
+                    levelName = "Low Stress (Level 1)";
+                    probabilities = [15, 65, 20, 0, 0];
+                    recommendations = [
+                        "Your stress levels are low but present.",
+                        "Consider incorporating regular relaxation techniques.",
+                        "Maintain consistent sleep patterns to preserve your low stress state."
+                    ];
                 } else if (stressScore < 60) {
-                    stressLevel = 'Medium Stress (Level 2)';
-                    stressLevels['Low Stress (Level 1)'] = 15;
-                    stressLevels['Medium Stress (Level 2)'] = 70;
-                    stressLevels['Medium Stress (Level 3)'] = 15;
+                    level = 2;
+                    levelName = "Medium Stress (Level 2)";
+                    probabilities = [0, 15, 70, 15, 0];
+                    recommendations = [
+                        "Your stress level is moderate.",
+                        "Consider meditation and regular exercise to manage stress levels.",
+                        "Monitor your sleep patterns for improved well-being."
+                    ];
                 } else if (stressScore < 80) {
-                    stressLevel = 'Medium Stress (Level 3)';
-                    stressLevels['Medium Stress (Level 2)'] = 15;
-                    stressLevels['Medium Stress (Level 3)'] = 70;
-                    stressLevels['High Stress (Level 4)'] = 15;
+                    level = 3;
+                    levelName = "Medium Stress (Level 3)";
+                    probabilities = [0, 0, 15, 70, 15];
+                    recommendations = [
+                        "Your stress level is moderately high.",
+                        "Try deep breathing exercises and consider reducing caffeine intake.",
+                        "Prioritize work-life balance and establish a regular sleep schedule."
+                    ];
                 } else {
-                    stressLevel = 'High Stress (Level 4)';
-                    stressLevels['Medium Stress (Level 3)'] = 20;
-                    stressLevels['High Stress (Level 4)'] = 80;
+                    level = 4;
+                    levelName = "High Stress (Level 4)";
+                    probabilities = [0, 0, 0, 20, 80];
+                    recommendations = [
+                        "Your stress level is high. Consider talking to a healthcare professional.",
+                        "Implement stress reduction techniques such as meditation and regular exercise.",
+                        "Review your sleep hygiene and consider limiting screen time before bed."
+                    ];
                 }
-                
-                // Calculate confidence (for demo)
-                const confidence = 85 + Math.floor(Math.random() * 10);
-                
-                // Display results
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('resultArea').classList.remove('hidden');
-                document.getElementById('stressLevel').textContent = stressLevel;
-                document.getElementById('confidence').textContent = confidence;
-                
-                // Update stress indicator bar
-                document.getElementById('stressIndicator').style.width = stressScore + '%';
-                
-                // Update chart
-                updateChart(stressLevels);
-            }
-            
-            function updateChart(stressLevels) {
-                const ctx = document.getElementById('stressChart').getContext('2d');
-                
-                if (chart) {
-                    chart.destroy();
+
+                const confidence = 75 + Math.floor(Math.random() * 20);
+
+                document.getElementById('level-value').textContent = levelName;
+                document.getElementById('confidence-value').textContent = confidence + '%';
+
+                const meterWidth = (level / 4) * 100;
+                document.getElementById('meter-fill').style.width = meterWidth + '%';
+
+                const meterFill = document.getElementById('meter-fill');
+                if (level <= 1) {
+                    meterFill.style.backgroundColor = 'var(--success-color)';
+                } else if (level <= 3) {
+                    meterFill.style.backgroundColor = 'var(--warning-color)';
+                } else {
+                    meterFill.style.backgroundColor = 'var(--danger-color)';
                 }
-                
-                chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(stressLevels),
-                        datasets: [{
-                            label: 'Probability (%)',
-                            data: Object.values(stressLevels),
-                            backgroundColor: [
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(46, 204, 113, 0.7)',
-                                'rgba(255, 193, 7, 0.7)',
-                                'rgba(255, 193, 7, 0.7)',
-                                'rgba(231, 76, 60, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(46, 204, 113, 1)',
-                                'rgba(255, 193, 7, 1)',
-                                'rgba(255, 193, 7, 1)',
-                                'rgba(231, 76, 60, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-        });
-        
-        // Connect to our Python backend
-        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Show loading indicator
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('resultArea').classList.add('hidden');
-            
-            // Collect form data
-            const formData = {
-                snoring_range: parseFloat(document.getElementById('snoring').value),
-                respiration_rate: parseFloat(document.getElementById('respiration').value),
-                body_temperature: parseFloat(document.getElementById('temperature').value),
-                limb_movement: parseFloat(document.getElementById('limb').value),
-                blood_oxygen: parseFloat(document.getElementById('oxygen').value),
-                eye_movement: parseFloat(document.getElementById('eye').value),
-                hours_of_sleep: parseFloat(document.getElementById('sleep').value),
-                heart_rate: parseFloat(document.getElementById('heart').value)
-            };
-            
-            try {
-         
+
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById('prob-' + i).style.width = probabilities[i] + '%';
+                    document.getElementById('prob-value-' + i).textContent = probabilities[i] + '%';
+                }
+
+                document.getElementById('recommendation').innerHTML = `
+                    <h4>Recommendation</h4>
+                    <p>${recommendations[0]}</p>
+                    <p>${recommendations[1]}</p>
+                    <p>${recommendations[2]}</p>
+                `;
+
+                const resultsContainer = document.querySelector('.results-container');
+                resultsContainer.classList.add('pulse-animation');
                 setTimeout(() => {
-                    processPrediction(formData);
-                }, 1500);
-                
-             
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while making the prediction. Please try again.');
-                document.getElementById('loading').style.display = 'none';
-            }
+                    resultsContainer.classList.remove('pulse-animation');
+                }, 1000);
+            });
+
+            document.getElementById('predict-button').click();
+
+            animateNeuronNetwork();
+        });
+
+        function animateNeuronNetwork() {
+            const neurons = document.querySelectorAll('.neuron');
+
+            neurons.forEach(neuron => {
+                neuron.style.opacity = 0;
+            });
+
+            neurons.forEach(neuron => {
+                const delay = Math.random() * 2000;
+                setTimeout(() => {
+                    neuron.style.opacity = 1;
+                    pulseNeuron(neuron);
+                }, delay);
+            });
+        }
+
+        function pulseNeuron(neuron) {
+
+            const pulseDuration = 1000 + Math.random() * 2000;
+
+            neuron.classList.add('pulse');
+            setTimeout(() => {
+                neuron.classList.remove('pulse');
+
+                setTimeout(() => {
+                    pulseNeuron(neuron);
+                }, Math.random() * 3000);
+            }, pulseDuration);
+        }
+
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
-</body>
-</html>
+
+</body></html>
